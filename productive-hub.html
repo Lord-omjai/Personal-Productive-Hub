@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Personal Productivity Hub</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
   <style>
     :root {
       --primary: #4361ee;
       --primary-light: #4895ef;
       --secondary: #3f37c9;
       --success: #4cc9f0;
+      --completed: #4ade80;
       --dark: #1e1e2c;
       --light: #f8f9fa;
       --gray: #6c757d;
@@ -24,6 +24,7 @@
       --primary-light: #4361ee;
       --secondary: #3a0ca3;
       --success: #4cc9f0;
+      --completed: #16a34a;
       --dark: #121212;
       --light: #1e1e2c;
       --gray: #a0a0a0;
@@ -365,11 +366,51 @@
 
     .item-content {
       flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .checkbox-container {
+      position: relative;
+    }
+
+    .custom-checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--gray);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .custom-checkbox.checked {
+      background: var(--completed);
+      border-color: var(--completed);
+    }
+
+    .custom-checkbox.checked::after {
+      content: "✓";
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .item-text {
+      flex: 1;
     }
 
     .item-title {
       font-weight: 600;
       margin-bottom: 5px;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: var(--gray);
     }
 
     .item-date {
@@ -593,7 +634,9 @@
       </div>
       
       <div class="list-container">
-        <ul class="item-list" id="todoList"></ul>
+        <ul class="item-list" id="todoList">
+          <!-- To-Do items will be added here -->
+        </ul>
       </div>
     </section>
 
@@ -782,7 +825,8 @@
     function updateStats() {
       // To-Do stats
       const todos = JSON.parse(localStorage.getItem(TODO_STORAGE_KEY)) || [];
-      document.getElementById('todoCount').textContent = todos.length;
+      const pendingTodos = todos.filter(todo => !todo.completed);
+      document.getElementById('todoCount').textContent = pendingTodos.length;
       
       // Calculate completion percentage
       const completed = todos.filter(todo => todo.completed).length;
@@ -817,8 +861,14 @@
         
         listItem.innerHTML = `
           <div class="item-content">
-            <div class="item-title">${todo.text}</div>
-            <div class="item-date">Added: ${formatDate(todo.createdAt)}</div>
+            <div class="checkbox-container">
+              <div class="custom-checkbox ${todo.completed ? 'checked' : ''}" 
+                   onclick="toggleTodoCompletion('${todo.id}')"></div>
+            </div>
+            <div class="item-text">
+              <div class="item-title ${todo.completed ? 'completed' : ''}">${todo.text}</div>
+              <div class="item-date">Added: ${formatDate(todo.createdAt)}</div>
+            </div>
           </div>
           <div class="item-actions">
             <div class="delete-btn" onclick="deleteTodo('${todo.id}')">🗑️</div>
@@ -847,6 +897,20 @@
       localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos));
       
       input.value = '';
+      loadTodos();
+      updateStats();
+    }
+
+    function toggleTodoCompletion(id) {
+      let todos = JSON.parse(localStorage.getItem(TODO_STORAGE_KEY)) || [];
+      todos = todos.map(todo => {
+        if (todo.id === id) {
+          return {...todo, completed: !todo.completed};
+        }
+        return todo;
+      });
+      localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos));
+      
       loadTodos();
       updateStats();
     }
