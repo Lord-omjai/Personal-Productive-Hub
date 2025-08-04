@@ -17,6 +17,7 @@
       --gray: #6c757d;
       --card-bg: #ffffff;
       --shadow: rgba(0, 0, 0, 0.1);
+      --nav-text: #333; /* New variable for navigation text color */
     }
 
     .dark-theme {
@@ -30,6 +31,7 @@
       --gray: #a0a0a0;
       --card-bg: #252525;
       --shadow: rgba(0, 0, 0, 0.3);
+      --nav-text: #f0f0f0; /* Dark mode nav text color */
     }
 
     * {
@@ -129,7 +131,7 @@
       box-shadow: 0 6px 15px rgba(67, 97, 238, 0.5);
     }
 
-    /* Navigation */
+    /* Navigation - FIXED TEXT COLOR */
     nav {
       display: flex;
       justify-content: center;
@@ -150,11 +152,12 @@
       gap: 10px;
       transition: all 0.3s ease;
       box-shadow: 0 4px 10px var(--shadow);
+      color: var(--nav-text); /* Use the new variable for text color */
     }
 
     .nav-btn.active, .nav-btn:hover {
       background: var(--primary);
-      color: white;
+      color: white; /* Keep active/hover text as white */
       transform: translateY(-3px);
       box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
     }
